@@ -7,7 +7,9 @@
 
 import os
 import sqlite3
+from sqlite3 import IntegrityError
 from scrapy.pipelines.images import ImagesPipeline
+from scrapy.exceptions import DropItem
 
 
 class sqlitePipeline(object):
@@ -28,7 +30,8 @@ class sqlitePipeline(object):
 
         self.c.execute('''SELECT name FROM sqlite_master WHERE type="table" AND name=?''', (self.tableName,))
         if len(self.c.fetchall()) == 0:
-            self.c.execute('''CREATE TABLE %s (name text, 
+            self.c.execute('''CREATE TABLE %s (upc text PRIMARY KEY,
+                                            name text, 
                                             price real,
                                             web_url text, 
                                             local_url text,
@@ -39,14 +42,29 @@ class sqlitePipeline(object):
         self.conn.close()
 
     def process_item(self, item, spider):
+        upc = item['upc']
         product_name = item['name']
         product_price = float(item['price'][1:])
         web_url = item['images'][0]['url']
         local_url = item['images'][0]['path']
         checksum = item['images'][0]['checksum']
 
-        self.c.execute('''INSERT INTO %s VALUES (?,?,?,?,?)''' % self.tableName, 
-                                (product_name, product_price, web_url, local_url, checksum))
-        self.conn.commit()
+        try:
+            self.c.execute('''INSERT INTO %s VALUES (?,?,?,?,?,?)''' % self.tableName, 
+                                    (upc, product_name, product_price, web_url, local_url, checksum))
+            self.conn.commit()
+            
+            return item
 
-        return item
+        except IntegrityError:
+            raise DropItem("Item already exists: %s" % item)
+
+        
+
+
+
+
+
+
+
+

@@ -18,9 +18,9 @@ class ProductSpider(scrapy.Spider):
         next_page = response.css('li.next a::attr(href)').get()
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
-        # if next_page is not None:
-        #     next_page = response.urljoin(next_page)
-        #     yield scrapy.Request(next_page, callback=self.parse)
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
 
 
     def parse_product(self, response):
@@ -28,5 +28,14 @@ class ProductSpider(scrapy.Spider):
         image_urls = response.css('img::attr(src)').get()
         image_urls = [response.urljoin(image_urls)]
         price = response.css('p.price_color::text').get()
-        yield Product(name=name, image_urls=image_urls, price=price)
+
+        table = response.css('table.table tr')
+        for tr in table:
+            if tr.css('th::text').get() == 'UPC':
+                upc = tr.css('td::text').get()
+                break
+        else:
+            upc = None
+
+        yield Product(name=name, image_urls=image_urls, price=price, upc=upc)
 

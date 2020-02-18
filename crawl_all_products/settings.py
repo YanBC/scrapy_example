@@ -67,8 +67,8 @@ ROBOTSTXT_OBEY = True
 #ITEM_PIPELINES = {
 #    'crawl_all_products.pipelines.CrawlAllProductsPipeline': 300,
 #}
-SQLITE_URI = 'products.db'
-IMAGES_STORE = './product_images/'
+SQLITE_URI = './outputs/products.db'
+IMAGES_STORE = './outputs/product_images/'
 
 ITEM_PIPELINES = {'scrapy.pipelines.images.ImagesPipeline': 1, 
                 'crawl_all_products.pipelines.sqlitePipeline': 100}

@@ -16,4 +16,5 @@ class Product(scrapy.Item):
     image_urls = scrapy.Field()
     images = scrapy.Field()
     price = scrapy.Field()
+    upc = scrapy.Field()
     pass
