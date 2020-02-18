@@ -18,9 +18,9 @@ class ProductSpider(scrapy.Spider):
         next_page = response.css('li.next a::attr(href)').get()
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+        # if next_page is not None:
+        #     next_page = response.urljoin(next_page)
+        #     yield scrapy.Request(next_page, callback=self.parse)
 
 
     def parse_product(self, response):
